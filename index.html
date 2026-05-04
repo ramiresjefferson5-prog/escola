@@ -1,0 +1,1148 @@
+
+<!DOCTYPE html>
+  <html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ERP Escolar - Gestão</title>
+    <meta name="theme-color" content="#2563eb">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Bootstrap Icons: apenas ícones, sem JavaScript pesado -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Ícones Lucide CDN -->
+    <script src="https://unpkg.com/lucide@0.468.0"></script>
+
+    <!-- Supabase JS v2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Importação do CSS -->
+    <link rel="stylesheet" href="assets/css/main.css?v=2026-05-01-erp-app-v36-child-page-clean">
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-sans min-h-screen antialiased selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+
+    <!-- ECRÃ DE LOGIN -->
+    <div id="view-login" class="min-h-screen flex items-center justify-center p-4 app-login-bg">
+      <div class="login-school-shell w-full max-w-6xl">
+        <section class="login-school-hero">
+          <span class="login-school-badge"><i data-lucide="sparkles" class="w-4 h-4"></i> Rede social escolar</span>
+          <h1>ERP Escolar</h1>
+          <p>Um espaço seguro para professoras acompanharem a turma e responsáveis viverem de perto cada conquista, atividade e foto importante dos filhos.</p>
+          <div class="login-school-features">
+            <span><i data-lucide="shield-check" class="w-4 h-4"></i> Acesso seguro</span>
+            <span><i data-lucide="images" class="w-4 h-4"></i> Galeria em tempo real</span>
+            <span><i data-lucide="heart" class="w-4 h-4"></i> Família presente</span>
+          </div>
+        </section>
+
+        <section class="login-school-card">
+          <div class="login-role-tabs" aria-label="Tipo de acesso">
+            <button type="button" id="login-tab-teacher" class="is-active" onclick="window.app.showLoginPanel('teacher')">
+              <i data-lucide="graduation-cap" class="w-4 h-4"></i> Professora
+            </button>
+            <button type="button" id="login-tab-parent" onclick="window.app.showLoginPanel('parent')">
+              <i data-lucide="users" class="w-4 h-4"></i> Responsáveis
+            </button>
+          </div>
+
+          <div id="login-panel-teacher" class="login-panel">
+            <div class="login-panel-heading">
+              <span class="login-panel-icon bg-blue-50 text-blue-600 border-blue-100"><i data-lucide="book-open" class="w-5 h-5"></i></span>
+              <div>
+                <h2>Entrar como professora</h2>
+                <p>Acesse sua turma, chamada, atividades, galeria e perfis dos alunos.</p>
+              </div>
+            </div>
+
+            <form onsubmit="window.app.handleTeacherLogin(event)" class="space-y-4 text-left">
+              <div>
+                <label for="login-email" class="app-label">Email da professora</label>
+                <input type="email" id="login-email" autocomplete="email" placeholder="professora@escola.com" class="app-input">
+              </div>
+              <div>
+                <label for="login-password" class="app-label">Senha</label>
+                <input type="password" id="login-password" autocomplete="current-password" placeholder="Digite a senha" class="app-input">
+              </div>
+              <div id="login-teacher-error" class="hidden rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"></div>
+              <button id="btn-login-teacher" type="submit" class="w-full py-4 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 touch-manipulation">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                Entrar como professora
+              </button>
+            </form>
+          </div>
+
+          <div id="login-panel-parent" class="login-panel hidden">
+            <div class="login-panel-heading">
+              <span class="login-panel-icon bg-emerald-50 text-emerald-600 border-emerald-100"><i data-lucide="heart-handshake" class="w-5 h-5"></i></span>
+              <div>
+                <h2>Portal dos responsáveis</h2>
+                <p>Entre, acompanhe o perfil escolar do seu filho e participe da galeria da turma.</p>
+              </div>
+            </div>
+
+            <div class="parent-auth-switch">
+              <button type="button" id="parent-auth-login-tab" class="is-active" onclick="window.app.showParentAuthMode('login')">Entrar</button>
+              <button type="button" id="parent-auth-signup-tab" onclick="window.app.showParentAuthMode('signup')">Criar acesso</button>
+            </div>
+            <div class="parent-auth-separator"><span>Entre com email e senha</span></div>
+
+            <form id="parent-login-form" onsubmit="window.app.handleParentLogin(event)" class="space-y-4 text-left">
+              <div>
+                <label for="parent-login-email" class="app-label">Email do responsável</label>
+                <input type="email" id="parent-login-email" autocomplete="email" placeholder="responsavel@email.com" class="app-input">
+              </div>
+              <div>
+                <label for="parent-login-password" class="app-label">Senha</label>
+                <input type="password" id="parent-login-password" autocomplete="current-password" placeholder="Digite a senha" class="app-input">
+              </div>
+              <div id="login-parent-error" class="hidden rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"></div>
+              <button id="btn-login-parent" type="submit" class="w-full py-4 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 touch-manipulation">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                Entrar como responsável
+              </button>
+            </form>
+
+            <form id="parent-signup-form" onsubmit="window.app.handleParentSignup(event)" class="hidden space-y-4 text-left">
+              <div>
+                <label for="parent-signup-name" class="app-label">Nome completo</label>
+                <input type="text" id="parent-signup-name" autocomplete="name" placeholder="Ex: Mariana Silva" class="app-input">
+              </div>
+              <div>
+                <label for="parent-signup-child-name" class="app-label">Nome e sobrenome do filho(a)</label>
+                <input type="text" id="parent-signup-child-name" autocomplete="off" placeholder="Ex: Lucas Silva" class="app-input" oninput="window.app.handleParentChildNameInput('signup')" onblur="window.app.handleParentChildNameInput('signup', { immediate: true })">
+                <div id="parent-signup-child-preview" class="parent-child-match-slot"></div>
+                <p class="mt-1 text-[11px] leading-relaxed text-slate-500">Digite o nome mesmo sem acento ou com pequenos erros. O sistema vai sugerir a ficha com foto para você confirmar antes de criar o acesso.</p>
+              </div>
+              <div>
+                <label for="parent-signup-email" class="app-label">Email</label>
+                <input type="email" id="parent-signup-email" autocomplete="email" placeholder="responsavel@email.com" class="app-input">
+              </div>
+              <div>
+                <label for="parent-signup-password" class="app-label">Senha</label>
+                <input type="password" id="parent-signup-password" autocomplete="new-password" placeholder="Crie uma senha segura" class="app-input">
+              </div>
+              <div id="signup-parent-message" class="hidden rounded-2xl border px-4 py-3 text-sm font-semibold"></div>
+              <button id="btn-signup-parent" type="submit" class="w-full py-4 px-4 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2 touch-manipulation">
+                <i data-lucide="mail-check" class="w-5 h-5"></i>
+                Criar acesso e verificar email
+              </button>
+              <p class="text-xs leading-relaxed text-slate-500">
+                Após criar o acesso, verifique seu email. No primeiro login, confira a ficha do seu filho e leia o mini tutorial para entrar no painel oficial.
+              </p>
+            </form>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- DASHBOARD DA PROFESSORA -->
+    <div id="view-teacher" class="hidden-view flex h-screen overflow-hidden app-shell">
+      <!-- Sidebar Desktop -->
+      <aside class="w-64 bg-white/90 backdrop-blur-md border-r border-slate-200/70 flex-col hidden md:flex shadow-sm">
+        <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+            <i data-lucide="book-open" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-slate-800 leading-tight">Área Docente</h2>
+            <p id="teacher-sidebar-subtitle" class="text-xs text-slate-500">Gestão Escolar</p>
+          </div>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+          <button onclick="window.app.switchTeacherTab('students')" id="tab-btn-students" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors bg-blue-50 text-blue-700">
+            <i data-lucide="users" class="w-5 h-5"></i> Turma & Alunos
+          </button>
+          <button onclick="window.app.switchTeacherTab('routine')" id="tab-btn-routine" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors text-slate-600 hover:bg-slate-50">
+            <i data-lucide="calendar" class="w-5 h-5"></i> Rotina Semanal
+          </button>
+          <button onclick="window.app.openAttendanceModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors mt-4 border border-slate-200">
+            <i data-lucide="check-square" class="w-5 h-5"></i> Fazer Chamada
+          </button>
+        </nav>
+        <div class="p-4 border-t border-slate-100">
+          <button onclick="window.app.logout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors">
+            <i data-lucide="log-out" class="w-5 h-5"></i> Sair
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+      <!-- Mobile Header -->
+      <div class="md:hidden flex items-center justify-between bg-white/95 backdrop-blur-md px-4 py-3 border-b border-slate-200 flex-shrink-0 pt-safe z-30 shadow-sm">
+        <div class="flex items-center gap-3">
+          <button onclick="window.app.openMobileMenu()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-xl touch-manipulation">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+          <h2 id="mobile-header-title" class="font-bold text-slate-800 text-lg">A Minha Turma</h2>
+        </div>
+        <button id="mobile-header-add-btn" onclick="window.app.openCreateChoiceModal()" aria-label="Adicionar aluno ou atividade global" class="w-9 h-9 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg flex items-center justify-center text-white shadow-sm transition-colors touch-manipulation">
+          <i data-lucide="plus" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Mobile Sidebar Overlay -->
+        <div id="mobile-menu-overlay" onclick="window.app.closeMobileMenu()" class="hidden-view fixed inset-0 bg-slate-900/60 z-40 transition-opacity duration-300 opacity-0 md:hidden"></div>
+
+        <!-- Mobile Sidebar Drawer -->
+        <aside id="mobile-sidebar" class="fixed top-0 left-0 bottom-0 w-72 max-w-[85vw] bg-white z-50 transform -translate-x-full transition-transform duration-300 app-shadow-elevated flex flex-col md:hidden pt-safe pb-safe">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md">
+                <i data-lucide="book-open" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h2 class="font-bold text-slate-800 leading-tight text-lg">Área Docente</h2>
+                <p id="mobile-teacher-sidebar-subtitle" class="text-xs text-slate-500 font-medium">Gestão Escolar</p>
+              </div>
+            </div>
+            <button onclick="window.app.closeMobileMenu()" class="p-2 -mr-2 text-slate-400 hover:bg-slate-200 hover:text-slate-600 rounded-full touch-manipulation transition-colors">
+              <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+          </div>
+          
+          <nav class="flex-1 p-4 space-y-2 overflow-y-auto no-scrollbar">
+            <button onclick="window.app.switchTeacherTab('students'); window.app.closeMobileMenu()" id="mob-side-tab-students" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-colors bg-blue-50 text-blue-700">
+              <i data-lucide="users" class="w-5 h-5"></i> Turma & Alunos
+            </button>
+            <button onclick="window.app.switchTeacherTab('routine'); window.app.closeMobileMenu()" id="mob-side-tab-routine" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-colors text-slate-600 hover:bg-slate-50">
+              <i data-lucide="calendar" class="w-5 h-5"></i> Rotina Semanal
+            </button>
+            
+            <div class="h-px bg-slate-100 my-2"></div>
+            
+            <button onclick="window.app.openAttendanceModal(); window.app.closeMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium text-slate-600 hover:bg-slate-50 transition-colors border border-slate-200">
+              <i data-lucide="check-square" class="w-5 h-5"></i> Fazer Chamada
+            </button>
+          </nav>
+          
+          <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+            <button onclick="window.app.logout()" class="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium text-red-600 hover:bg-red-50 transition-colors">
+              <i data-lucide="log-out" class="w-5 h-5"></i> Sair da Conta
+            </button>
+          </div>
+        </aside>
+
+        <!-- Conteúdo com Scroll -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar pb-24">
+        <!-- Aba Alunos -->
+        <div id="tab-students" class="block">
+          <div class="hidden md:flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-slate-800">A Minha Turma</h2>
+            <button onclick="window.app.openCreateChoiceModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 md:px-4 md:py-2 rounded-xl transition-colors touch-manipulation font-medium text-sm md:text-base">
+              <i data-lucide="plus" class="w-4 h-4 md:w-5 md:h-5"></i> Adicionar
+            </button>
+          </div>
+
+          <!-- ESTATÍSTICAS DA TURMA -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 font-medium">Total de Alunos</p>
+                  <p id="stat-total" class="text-lg font-bold text-slate-800">0</p>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="user-check" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 font-medium">Presentes Hoje</p>
+                  <p id="stat-presentes" class="text-lg font-bold text-slate-800">0</p>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="user-x" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 font-medium">Faltas Hoje</p>
+                  <p id="stat-faltas" class="text-lg font-bold text-slate-800">0</p>
+                </div>
+              </div>
+              <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="award" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-slate-500 font-medium">Conquistas Totais</p>
+                  <p id="stat-conquistas" class="text-lg font-bold text-slate-800">0</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="birthday-alerts" class="hidden mb-6">
+              <!-- Alertas de aniversário renderizados via JS -->
+            </div>
+
+            <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Renderizado via JS do Supabase -->
+            </div>
+          </div>
+
+          <!-- Aba Rotina -->
+          <div id="tab-routine" class="hidden-view max-w-4xl">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-2xl font-bold text-slate-800">Rotina Semanal</h2>
+              <button id="btn-edit-routine" onclick="window.app.toggleRoutineEdit()" class="flex items-center gap-2 bg-slate-200 text-slate-700 px-4 py-2 rounded-xl touch-manipulation font-medium">
+                Editar Rotina
+              </button>
+            </div>
+            <div id="routine-list" class="space-y-3">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- DASHBOARD DOS PAIS -->
+    <div id="view-parent" class="hidden-view parent-app-shell app-shell min-h-screen">
+      <main id="parent-content" class="parent-app-content">
+        <!-- Renderizado via JS -->
+      </main>
+    </div>
+
+    <!-- MODAL EXCLUSIVO DE CHAMADA -->
+    <div id="modal-attendance" class="hidden-view fixed inset-0 bg-white z-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="bg-slate-900 text-white p-4 md:p-6 flex items-center justify-between flex-shrink-0">
+        <div>
+          <h1 class="text-xl md:text-2xl font-bold flex items-center gap-2">
+            <i data-lucide="clipboard-check" class="text-emerald-300 w-6 h-6"></i> Chamada da turma
+          </h1>
+          <p class="text-sm text-slate-200/90 mt-1 hidden md:block">Organize a presença da sala com uma rotina leve, clara e escolar.</p>
+        </div>
+        <button onclick="window.app.closeAttendanceModal()" class="p-3 hover:bg-slate-800 rounded-full transition-colors touch-manipulation">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+      <div class="bg-slate-100 p-4 flex justify-center border-b border-slate-200 flex-shrink-0">
+        <input type="date" id="attendance-date" onchange="window.app.renderAttendanceList()" class="px-4 py-3 rounded-xl border border-slate-300 shadow-sm outline-none w-full max-w-xs text-center font-medium text-slate-700 bg-white">
+      </div>
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 no-scrollbar">
+        <div id="attendance-list" class="max-w-3xl mx-auto space-y-3 pb-8">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ESCOLHA DE ADIÇÃO -->
+    <div id="modal-create-choice" class="hidden-view fixed inset-0 z-[66] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onclick="if(event.target===this) window.app.closeCreateChoiceModal()">
+      <div class="create-choice-card bg-white w-full max-w-md rounded-3xl border border-white/80 shadow-xl overflow-hidden">
+        <div class="create-choice-header">
+          <div class="create-choice-icon">
+            <i data-lucide="plus" class="w-6 h-6"></i>
+          </div>
+          <div class="min-w-0">
+            <p class="profile-eyebrow">Adicionar</p>
+            <h2 class="text-xl font-bold text-slate-900 leading-tight">O que deseja adicionar?</h2>
+            <p class="text-sm text-slate-500 mt-1">Escolha se quer cadastrar um aluno ou registrar uma atividade para toda a turma.</p>
+          </div>
+          <button type="button" onclick="window.app.closeCreateChoiceModal()" class="app-icon-btn flex-shrink-0" aria-label="Fechar opções">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="create-choice-body">
+          <button type="button" onclick="window.app.chooseAddStudent()" class="create-choice-option">
+            <span class="create-choice-option-icon bg-blue-50 text-blue-600 border-blue-100">
+              <i data-lucide="user-plus" class="w-5 h-5"></i>
+            </span>
+            <span class="create-choice-option-text">
+              <strong>Novo aluno</strong>
+              <small>Cadastrar ficha, responsáveis, contactos e foto.</small>
+            </span>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+          </button>
+          <button type="button" onclick="window.app.openGlobalActivityModal()" class="create-choice-option">
+            <span class="create-choice-option-icon bg-emerald-50 text-emerald-600 border-emerald-100">
+              <i data-lucide="clipboard-plus" class="w-5 h-5"></i>
+            </span>
+            <span class="create-choice-option-text">
+              <strong>Atividade para todos</strong>
+              <small>Registrar a mesma atividade no perfil de todos os alunos.</small>
+            </span>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+          </button>
+          <button type="button" onclick="window.app.openGalleryPhotoModal()" class="create-choice-option">
+            <span class="create-choice-option-icon bg-violet-50 text-violet-600 border-violet-100">
+              <i data-lucide="image-plus" class="w-5 h-5"></i>
+            </span>
+            <span class="create-choice-option-text">
+              <strong>Foto para galeria</strong>
+              <small>Publicar foto da turma ou foto individual para os responsáveis.</small>
+            </span>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL FOTO DA GALERIA -->
+    <div id="modal-gallery-photo" class="hidden-view fixed inset-0 z-[65] bg-slate-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="full-page-modal-shell flex-1 flex flex-col min-h-0">
+        <div class="modal-clean-header">
+          <div>
+            <p class="profile-eyebrow">Galeria em tempo real</p>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900">Publicar foto</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Envie uma foto da turma toda ou uma foto individual vinculada ao aluno.</p>
+          </div>
+          <button onclick="window.app.closeGalleryPhotoModal()" class="app-icon-btn" aria-label="Fechar galeria">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="full-page-modal-body flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6">
+          <section class="full-page-panel gallery-upload-panel">
+            <div class="full-page-section-head mb-4">
+              <div>
+                <p class="profile-eyebrow">Destino da foto</p>
+                <h3>Quem poderá visualizar?</h3>
+              </div>
+              <span id="gallery-photo-scope-help" class="full-page-help-pill"><i data-lucide="users" class="w-4 h-4"></i> Responsáveis vinculados</span>
+            </div>
+
+            <div class="gallery-type-toggle gallery-type-toggle-4">
+              <button type="button" data-gallery-photo-type="turma" onclick="window.app.selectGalleryPhotoType('turma')" class="is-selected">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                <strong>Foto da turma</strong>
+                <small>Todos os pais da turma visualizam.</small>
+              </button>
+              <button type="button" data-gallery-photo-type="aluno" onclick="window.app.selectGalleryPhotoType('aluno')">
+                <i data-lucide="user-round" class="w-5 h-5"></i>
+                <strong>Foto individual</strong>
+                <small>Apenas os responsáveis do aluno visualizam.</small>
+              </button>
+              <button type="button" data-gallery-photo-type="evento" onclick="window.app.selectGalleryPhotoType('evento')">
+                <i data-lucide="party-popper" class="w-5 h-5"></i>
+                <strong>Evento escolar</strong>
+                <small>Fotos de eventos, passeios e momentos especiais.</small>
+              </button>
+              <button type="button" data-gallery-photo-type="geral" onclick="window.app.selectGalleryPhotoType('geral')">
+                <i data-lucide="school" class="w-5 h-5"></i>
+                <strong>Geral da escola</strong>
+                <small>Publicação geral para famílias acompanharem a escola.</small>
+              </button>
+            </div>
+
+            <div class="gallery-upload-grid mt-5">
+              <div>
+                <label class="gallery-dropzone" for="gallery-photo-file">
+                  <input type="file" id="gallery-photo-file" accept="image/*" class="hidden" onchange="window.app.handleGalleryPhotoSelection(event)">
+                  <img id="gallery-photo-preview" class="hidden" alt="Pré-visualização da foto">
+                  <span id="gallery-photo-placeholder" class="gallery-dropzone-placeholder">
+                    <i data-lucide="image-plus" class="w-8 h-8"></i>
+                    <strong>Selecionar foto</strong>
+                    <small>Toque para escolher uma imagem da turma ou do aluno.</small>
+                  </span>
+                </label>
+              </div>
+
+              <div class="space-y-4">
+                <div id="gallery-photo-turma-box">
+                  <label class="app-label" for="gallery-photo-turma">Turma</label>
+                  <select id="gallery-photo-turma" class="app-input"></select>
+                </div>
+
+                <div id="gallery-photo-aluno-box" class="hidden">
+                  <label class="app-label" for="gallery-photo-aluno">Aluno</label>
+                  <select id="gallery-photo-aluno" class="app-input"></select>
+                </div>
+
+                <div>
+                  <label class="app-label" for="gallery-photo-title">Título</label>
+                  <input type="text" id="gallery-photo-title" class="app-input" placeholder="Ex: Atividade de pintura">
+                </div>
+
+                <div>
+                  <label class="app-label" for="gallery-photo-desc">Descrição</label>
+                  <textarea id="gallery-photo-desc" rows="4" class="app-input" placeholder="Mensagem opcional para os responsáveis."></textarea>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="fullscreen-page-footer">
+          <button type="button" onclick="window.app.closeGalleryPhotoModal()" class="btn-soft">Cancelar</button>
+          <button type="button" id="btn-save-gallery-photo" onclick="window.app.saveGalleryPhoto()" class="btn-primary-clean">
+            <i data-lucide="send" class="w-4 h-4"></i> Publicar na galeria
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ADICIONAR ALUNO (TELA CHEIA) -->
+    <div id="modal-add-student" class="hidden-view fixed inset-0 bg-slate-50 z-50 flex flex-col animate-fade-in">
+      <!-- Cabeçalho da Página -->
+      <div class="bg-white px-4 py-3 border-b border-slate-200 flex items-center gap-4 flex-shrink-0 pt-safe z-30 shadow-sm">
+        <button onclick="window.app.closeAddStudentModal()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors touch-manipulation">
+          <i data-lucide="arrow-left" class="w-6 h-6"></i>
+        </button>
+        <h2 class="text-xl font-bold text-slate-800">Adicionar Novo Aluno</h2>
+      </div>
+      
+      <!-- Área com Scroll para os formulários -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 no-scrollbar">
+        <div class="max-w-3xl mx-auto space-y-6 pb-6">
+          
+          <!-- Avatar Placeholder Visual Atualizado -->
+          <div class="flex flex-col items-center justify-center mb-8 mt-4 relative">
+            <input type="file" id="input-new-foto" accept="image/*" class="hidden" onchange="window.app.handleImageSelection(event)">
+            
+            <div onclick="document.getElementById('input-new-foto').click()" class="w-28 h-28 bg-blue-50 rounded-full border-4 border-white shadow-md flex items-center justify-center text-blue-500 mb-3 cursor-pointer overflow-hidden relative group">
+              <i id="new-student-photo-icon" data-lucide="camera" class="w-10 h-10 group-hover:scale-110 transition-transform"></i>
+              <img id="new-student-photo-preview" class="w-full h-full object-cover hidden">
+              <div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                 <i data-lucide="upload" class="text-white w-6 h-6"></i>
+              </div>
+            </div>
+            
+            <p class="text-slate-500 text-sm font-medium">Toque para adicionar foto</p>
+          </div>
+
+          <!-- Dados Pessoais -->
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <i data-lucide="user" class="w-5 h-5 text-blue-500"></i> Dados Pessoais
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nome Completo *</label>
+                <input type="text" id="input-new-nome" placeholder="Ex: Lucas Silva" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Data de nascimento *</label>
+                <input type="date" id="input-new-data-nascimento" onchange="window.app.atualizarIdadeCalculada('new')" oninput="window.app.atualizarIdadeCalculada('new')" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+                <p id="input-new-idade-calculada" class="mt-1.5 text-xs font-semibold text-slate-400">Idade calculada automaticamente.</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Professora</label>
+                <select id="input-new-professora" onchange="window.app.sincronizarSelectTurmasAluno('new')" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+                  <option value="">Carregando professoras...</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Turma / Classe</label>
+                <select id="input-new-turma" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+                  <option value="">Carregando turmas...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filiação e Contactos -->
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <i data-lucide="users" class="w-5 h-5 text-emerald-500"></i> Filiação e Contactos
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nome da Mãe</label>
+                <input type="text" id="input-new-mae" placeholder="Ex: Mariana Silva" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Nome do Pai</label>
+                <input type="text" id="input-new-pai" placeholder="Ex: Carlos Silva" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Contacto 1 (Telemóvel)</label>
+                <input type="text" id="input-new-contato1" placeholder="Ex: 912345678" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Contacto 2</label>
+                <input type="text" id="input-new-contato2" placeholder="Ex: 912345679" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Morada</label>
+                <input type="text" id="input-new-endereco" placeholder="Ex: Rua das Flores, 123" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+            </div>
+          </div>
+
+          <!-- Autorizações e Saúde -->
+          <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-5 h-5 text-purple-500"></i> Autorizações e Saúde
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Responsável Autorizado 1</label>
+                <input type="text" id="input-new-resp1" placeholder="Pessoa autorizada a recolher o aluno" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Responsável Autorizado 2</label>
+                <input type="text" id="input-new-resp2" placeholder="Pessoa autorizada a recolher o aluno" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Responsável Autorizado 3</label>
+                <input type="text" id="input-new-resp3" placeholder="Pessoa autorizada a recolher o aluno" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-700 mb-1">Indicações (Saúde, Alergias, Cuidados)</label>
+                <textarea id="input-new-indicacoes" placeholder="Ex: Alergia a amendoim. Requer atenção especial com..." rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3.5 outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-700"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botões de Ação Fixos no Fundo -->
+      <div class="bg-white p-4 border-t border-slate-100 flex justify-end gap-3 flex-shrink-0 pb-safe shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+        <button onclick="window.app.closeAddStudentModal()" class="px-6 py-3.5 text-slate-600 font-medium hover:bg-slate-100 rounded-2xl transition-colors touch-manipulation">Cancelar</button>
+        <button id="btn-save-student" onclick="window.app.saveNewStudent()" class="px-6 py-3.5 bg-blue-600 text-white font-medium rounded-2xl hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation flex items-center gap-2 shadow-lg shadow-blue-600/30">
+          Guardar Aluno
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL DE PERFIL DO ALUNO (TELA CHEIA) -->
+    <div id="modal-profile" class="hidden-view fixed inset-0 bg-slate-50 z-50 flex flex-col animate-fade-in">
+      <div id="profile-header" class="bg-white/95 backdrop-blur-md px-4 py-3 border-b border-slate-200 flex items-center gap-4 flex-shrink-0 pt-safe z-30 shadow-sm">
+      </div>
+      
+      <div class="profile-scroll flex-1 overflow-y-auto no-scrollbar pb-safe">
+        <div class="profile-layout max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-6 py-4 lg:py-6">
+          <aside class="profile-sidebar">
+            <section class="profile-card profile-sticky-card">
+              <div id="profile-header-info"></div>
+              <div class="profile-actions mt-5">
+                <a id="profile-whatsapp" href="#" target="_blank" class="hidden items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors touch-manipulation">
+                  <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+                </a>
+                <button onclick="window.app.toggleStudentEdit(true)" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 py-3 rounded-xl text-sm font-semibold transition-colors touch-manipulation">
+                  <i data-lucide="pencil" class="w-4 h-4"></i> Editar ficha
+                </button>
+              </div>
+            </section>
+          </aside>
+
+          <main class="profile-main space-y-4 lg:space-y-5">
+            <section class="profile-card">
+              <div class="profile-section-heading">
+                <div>
+                  <p class="profile-eyebrow">Visão pedagógica</p>
+                  <h3 class="profile-title">Resumo do aluno</h3>
+                  <p class="profile-subtitle">Indicadores calculados a partir das chamadas, conquistas e atividades registradas.</p>
+                </div>
+                <span class="profile-updated-pill"><i data-lucide="activity" class="w-4 h-4"></i> Dados atualizados</span>
+              </div>
+              <div id="profile-overview-cards" class="profile-metrics-grid mt-5"></div>
+            </section>
+
+            <section id="profile-analysis-card" class="profile-card"></section>
+
+            <section class="profile-card">
+              <div class="profile-section-heading mb-5">
+                <div>
+                  <p class="profile-eyebrow">Ficha cadastral</p>
+                  <h3 class="profile-title">Informações gerais</h3>
+                </div>
+              </div>
+
+              <div id="profile-readonly-info" class="profile-info-grid">
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-person-workspace"></i> Professora</p>
+                  <p id="profile-professora" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-collection"></i> Turma / Classe</p>
+                  <p id="profile-turma" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-cake2"></i> Data de nascimento</p>
+                  <p id="profile-data-nascimento" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-bell"></i> Próximo aniversário</p>
+                  <p id="profile-proximo-aniversario" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-person-heart"></i> Mãe</p>
+                  <p id="profile-mae" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-person"></i> Pai</p>
+                  <p id="profile-pai" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-telephone"></i> Contacto 1</p>
+                  <p id="profile-contato1" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-telephone-plus"></i> Contacto 2</p>
+                  <p id="profile-contato2" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile profile-info-wide">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-geo-alt"></i> Morada</p>
+                  <p id="profile-endereco" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="app-info-tile profile-info-wide">
+                  <p class="text-xs text-slate-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-shield-check"></i> Responsáveis Autorizados</p>
+                  <p id="profile-responsaveis" class="text-slate-700 text-sm md:text-base font-medium">-</p>
+                </div>
+                <div class="hidden app-info-tile profile-info-wide border-red-100 bg-red-50/70" id="profile-indicacoes-container">
+                  <p class="text-xs text-red-400 font-bold uppercase mb-0.5 flex items-center gap-1"><i class="bi bi-exclamation-triangle"></i> Indicações / Alergias</p>
+                  <p id="profile-indicacoes" class="text-red-700 text-sm md:text-base font-medium">-</p>
+                </div>
+              </div>
+            </section>
+
+            <div class="profile-grid-2">
+              <section class="profile-card flex flex-col">
+                <div class="profile-section-heading mb-4">
+                  <div>
+                    <p class="profile-eyebrow">Reconhecimento</p>
+                    <h3 class="profile-title flex items-center gap-2"><span class="app-section-icon"><i data-lucide="trophy" class="w-4 h-4"></i></span> Conquistas</h3>
+                  </div>
+                  <span id="profile-medal-count" class="profile-count-pill">0</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                  <button type="button" onclick="window.app.openAchievementModal()" class="app-inline-action">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Adicionar conquista
+                  </button>
+                  <button type="button" onclick="window.app.openAchievementsListModal()" class="app-inline-action app-inline-action-muted">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    Mostrar lista
+                  </button>
+                </div>
+
+                <div id="profile-achievements-preview" class="compact-record-list"></div>
+              </section>
+
+              <section class="profile-card flex flex-col">
+                <div class="profile-section-heading mb-4">
+                  <div>
+                    <p class="profile-eyebrow">Registros pedagógicos</p>
+                    <h3 class="profile-title flex items-center gap-2"><span class="app-section-icon text-emerald-600 bg-emerald-50 border-emerald-100"><i data-lucide="book-open" class="w-4 h-4"></i></span> Atividades</h3>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                  <button type="button" onclick="window.app.openActivityCreateModal()" class="app-inline-action">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Nova atividade
+                  </button>
+                  <button type="button" onclick="window.app.openActivitiesHistoryModal()" class="app-inline-action app-inline-action-muted">
+                    <i data-lucide="list" class="w-4 h-4"></i>
+                    Mostrar lista
+                  </button>
+                </div>
+                <div id="profile-activities-preview" class="compact-record-list"></div>
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL ADICIONAR CONQUISTA -->
+    <div id="modal-achievement" class="hidden-view fixed inset-0 z-[65] bg-slate-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="full-page-modal-shell flex-1 flex flex-col min-h-0">
+        <div class="modal-clean-header">
+          <div>
+            <p class="profile-eyebrow">Reconhecimento</p>
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900">Adicionar conquista</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Escolha uma conquista, escreva o motivo e salve no histórico do aluno.</p>
+          </div>
+          <button onclick="window.app.closeAchievementModal()" class="app-icon-btn" aria-label="Voltar ao perfil">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="full-page-modal-body flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6">
+          <section class="full-page-panel">
+            <div class="full-page-section-head">
+              <div>
+                <p class="profile-eyebrow">Tipo de reconhecimento</p>
+                <h3>Escolha a conquista</h3>
+              </div>
+              <span class="full-page-help-pill"><i data-lucide="sparkles" class="w-4 h-4"></i> Carrossel</span>
+            </div>
+            <div class="achievement-carousel" role="list" aria-label="Tipos de conquista">
+            <button type="button" data-achievement-select="Cordial" onclick="window.app.selectAchievementType('Cordial')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-sky-600"><i data-lucide="smile-plus" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Cordial</span>
+              <small>Gentileza e respeito</small>
+            </button>
+            <button type="button" data-achievement-select="Cooperativo" onclick="window.app.selectAchievementType('Cooperativo')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-emerald-600"><i data-lucide="handshake" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Cooperação</span>
+              <small>Ajudou colegas</small>
+            </button>
+            <button type="button" data-achievement-select="Participativo" onclick="window.app.selectAchievementType('Participativo')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-indigo-600"><i data-lucide="badge-check" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Participação</span>
+              <small>Participou bem</small>
+            </button>
+            <button type="button" data-achievement-select="Leitura" onclick="window.app.selectAchievementType('Leitura')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-violet-600"><i data-lucide="book-open-check" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Leitura</span>
+              <small>Avanço pedagógico</small>
+            </button>
+            <button type="button" data-achievement-select="Criatividade" onclick="window.app.selectAchievementType('Criatividade')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-pink-600"><i data-lucide="palette" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Criatividade</span>
+              <small>Ideias e expressão</small>
+            </button>
+            <button type="button" data-achievement-select="Super" onclick="window.app.selectAchievementType('Super')" class="achievement-choice-card">
+              <span class="achievement-choice-icon text-amber-600"><i data-lucide="trophy" class="w-6 h-6"></i></span>
+              <span class="achievement-choice-title">Destaque</span>
+              <small>Destaque do dia</small>
+            </button>
+            </div>
+          </section>
+
+          <section class="full-page-panel">
+            <div class="full-page-section-head mb-4">
+              <div>
+                <p class="profile-eyebrow">Comentário</p>
+                <h3>Motivo da conquista</h3>
+              </div>
+            </div>
+            <div>
+            <label for="modal-achievement-desc" class="app-label flex items-center gap-1.5 mb-2">
+              <i data-lucide="message-square-text" class="w-4 h-4 text-blue-500"></i> Comentário / motivo
+            </label>
+            <textarea id="modal-achievement-desc" rows="5" maxlength="280" placeholder="Ex: Demonstrou cooperação com a turma durante a atividade em grupo." class="app-input resize-none text-sm"></textarea>
+            <p class="text-[11px] text-slate-400 mt-2">Este comentário aparecerá no histórico do aluno e na visão dos pais.</p>
+            </div>
+          </section>
+        </div>
+
+        <div class="modal-clean-footer">
+          <button onclick="window.app.closeAchievementModal()" class="btn-soft">Cancelar</button>
+          <button id="btn-save-achievement" onclick="window.app.addAchievement()" class="btn-primary-clean">
+            <i data-lucide="save" class="w-4 h-4"></i> Salvar conquista
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL HISTÓRICO DE CONQUISTAS -->
+    <div id="modal-achievements-list" class="hidden-view fixed inset-0 z-[64] bg-slate-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="history-page-topbar bg-white/95 backdrop-blur-md border-b border-slate-200 flex-shrink-0 pt-safe">
+        <div class="history-page-title-wrap">
+          <button onclick="window.app.closeAchievementsListModal()" class="app-icon-btn" aria-label="Voltar ao perfil">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="min-w-0">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Histórico de conquistas</h2>
+            <p class="text-xs sm:text-sm text-slate-500 truncate">Filtros, resumo e lista completa de reconhecimentos.</p>
+          </div>
+        </div>
+        <button onclick="window.app.openAchievementModal()" class="header-action-btn hidden sm:inline-flex">
+          <span class="header-action-icon"><i data-lucide="plus" class="w-4 h-4"></i></span>
+          <span>Nova conquista</span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6 pb-safe">
+        <div class="history-page-grid">
+          <aside class="history-summary-card">
+            <p class="profile-eyebrow">Resumo</p>
+            <h3 class="text-lg font-bold text-slate-900 mt-1">Conquistas do aluno</h3>
+            <div class="history-summary-metrics mt-4">
+              <div><span id="modal-achievements-count">0</span><small>Total</small></div>
+              <div><span id="modal-achievements-month-count">0</span><small>No mês</small></div>
+              <div><span id="modal-achievements-main-type">-</span><small>Mais comum</small></div>
+            </div>
+            <div class="history-filter-box mt-5">
+              <label class="app-label">Filtrar por data</label>
+              <div class="grid grid-cols-1 gap-3 mt-2">
+                <input id="achievement-filter-start" type="date" class="app-input" onchange="window.app.renderProfileLists()">
+                <input id="achievement-filter-end" type="date" class="app-input" onchange="window.app.renderProfileLists()">
+                <button type="button" onclick="document.getElementById('achievement-filter-start').value='';document.getElementById('achievement-filter-end').value='';window.app.renderProfileLists();" class="btn-soft w-full">Limpar filtros</button>
+              </div>
+            </div>
+            <button onclick="window.app.openAchievementModal()" class="header-action-btn mobile w-full mt-4 sm:hidden justify-center">
+              <span class="header-action-icon"><i data-lucide="plus" class="w-4 h-4"></i></span>
+              <span>Nova conquista</span>
+            </button>
+          </aside>
+          <section class="history-list-card">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <p class="profile-eyebrow">Lista completa</p>
+                <h3 class="text-lg font-bold text-slate-900">Registros encontrados</h3>
+              </div>
+              <span id="modal-achievements-filtered-count" class="profile-count-pill">0</span>
+            </div>
+            <div id="modal-achievements-list-content" class="space-y-3"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAIS DE ATIVIDADES -->
+    <div id="modal-activity-create" class="hidden-view fixed inset-0 z-[65] bg-slate-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="full-page-modal-shell flex-1 flex flex-col min-h-0">
+        <div class="modal-clean-header">
+          <div>
+            <p class="profile-eyebrow">Registro pedagógico</p>
+            <h2 id="modal-activity-title" class="text-lg sm:text-xl font-bold text-slate-900">Nova atividade</h2>
+            <p id="modal-activity-subtitle" class="text-xs sm:text-sm text-slate-500 mt-1">Registre apenas uma nova atividade. A lista completa fica em outro modal.</p>
+          </div>
+          <button onclick="window.app.closeActivityCreateModal()" class="app-icon-btn" aria-label="Voltar ao perfil">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="full-page-modal-body flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6">
+          <section class="full-page-panel">
+            <div class="full-page-section-head mb-4">
+              <div>
+                <p class="profile-eyebrow">Classificação</p>
+                <h3>Tipo de atividade</h3>
+              </div>
+              <span id="modal-activity-help-pill" class="full-page-help-pill"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Registro diário</span>
+            </div>
+            <div class="activity-type-grid" role="list" aria-label="Tipo de atividade">
+            <button type="button" data-activity-type="Casa" onclick="window.app.selectActivityType('Casa')" class="activity-type-card"><i data-lucide="home" class="w-5 h-5"></i><span>Casa</span></button>
+            <button type="button" data-activity-type="Classe" onclick="window.app.selectActivityType('Classe')" class="activity-type-card"><i data-lucide="school" class="w-5 h-5"></i><span>Classe</span></button>
+            <button type="button" data-activity-type="Educação Física" onclick="window.app.selectActivityType('Educação Física')" class="activity-type-card"><i data-lucide="dumbbell" class="w-5 h-5"></i><span>Ed. Física</span></button>
+            <button type="button" data-activity-type="Brincadeira" onclick="window.app.selectActivityType('Brincadeira')" class="activity-type-card"><i data-lucide="puzzle" class="w-5 h-5"></i><span>Brincadeira</span></button>
+            <button type="button" data-activity-type="Leitura" onclick="window.app.selectActivityType('Leitura')" class="activity-type-card"><i data-lucide="book-open-check" class="w-5 h-5"></i><span>Leitura</span></button>
+            <button type="button" data-activity-type="Observação" onclick="window.app.selectActivityType('Observação')" class="activity-type-card"><i data-lucide="clipboard-list" class="w-5 h-5"></i><span>Observação</span></button>
+            </div>
+          </section>
+          <section class="full-page-panel">
+            <div class="full-page-section-head mb-4">
+              <div>
+                <p class="profile-eyebrow">Detalhes</p>
+                <h3>Informações da atividade</h3>
+              </div>
+            </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
+            <div>
+              <label for="modal-activity-date" class="app-label">Data da atividade</label>
+              <input id="modal-activity-date" type="date" class="app-input">
+            </div>
+            <div>
+              <label class="app-label">Tipo selecionado</label>
+              <div id="modal-activity-kind-display" class="activity-selected-pill">Classe</div>
+            </div>
+            <div>
+              <label class="app-label">Estado da atividade</label>
+              <div class="activity-status-toggle" role="group" aria-label="Estado da atividade">
+                <button type="button" data-activity-status="true" onclick="window.app.selectActivityStatus(true)">Feita</button>
+                <button type="button" data-activity-status="false" onclick="window.app.selectActivityStatus(false)">Não feita</button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-5">
+            <label for="modal-activity-input" class="app-label">Descrição da atividade</label>
+            <textarea id="modal-activity-input" rows="6" maxlength="500" placeholder="Ex: Realizou atividade de leitura com apoio e reconheceu novas sílabas." class="app-input resize-none text-sm"></textarea>
+            <p class="text-[11px] text-slate-400 mt-2">Use uma descrição objetiva. Ela aparecerá no histórico e na visão dos pais.</p>
+          </div>
+          </section>
+        </div>
+        <div class="modal-clean-footer">
+          <button onclick="window.app.closeActivityCreateModal()" class="btn-soft">Cancelar</button>
+          <button id="btn-add-activity" onclick="window.app.addActivity()" class="btn-primary-clean">
+            <i data-lucide="save" class="w-4 h-4"></i> Salvar atividade
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-activities-list" class="hidden-view fixed inset-0 z-[64] bg-slate-50 flex flex-col overflow-hidden animate-fade-in">
+      <div class="history-page-topbar bg-white/95 backdrop-blur-md border-b border-slate-200 flex-shrink-0 pt-safe">
+        <div class="history-page-title-wrap">
+          <button onclick="window.app.closeActivitiesHistoryModal()" class="app-icon-btn" aria-label="Voltar ao perfil">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+          </button>
+          <div class="min-w-0">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">Histórico de atividades</h2>
+            <p class="text-xs sm:text-sm text-slate-500 truncate">Resumo, filtros por data e lista completa de atividades.</p>
+          </div>
+        </div>
+        <button onclick="window.app.openActivityCreateModal()" class="header-action-btn hidden sm:inline-flex">
+          <span class="header-action-icon"><i data-lucide="plus" class="w-4 h-4"></i></span>
+          <span>Nova atividade</span>
+        </button>
+      </div>
+      <div class="flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6 pb-safe">
+        <div class="history-page-grid">
+          <aside class="history-summary-card">
+            <p class="profile-eyebrow">Resumo</p>
+            <h3 class="text-lg font-bold text-slate-900 mt-1">Atividades do aluno</h3>
+            <div class="history-summary-metrics mt-4">
+              <div><span id="modal-activities-count">0</span><small>Total</small></div>
+              <div><span id="modal-activities-month-count">0</span><small>No mês</small></div>
+              <div><span id="modal-activities-main-type">-</span><small>Mais comum</small></div>
+            </div>
+            <div class="history-filter-box mt-5">
+              <label class="app-label">Filtrar por data</label>
+              <div class="grid grid-cols-1 gap-3 mt-2">
+                <input id="activity-filter-start" type="date" class="app-input" onchange="window.app.renderProfileLists()">
+                <input id="activity-filter-end" type="date" class="app-input" onchange="window.app.renderProfileLists()">
+                <button type="button" onclick="document.getElementById('activity-filter-start').value='';document.getElementById('activity-filter-end').value='';window.app.renderProfileLists();" class="btn-soft w-full">Limpar filtros</button>
+              </div>
+            </div>
+            <button onclick="window.app.openActivityCreateModal()" class="header-action-btn mobile w-full mt-4 sm:hidden justify-center">
+              <span class="header-action-icon"><i data-lucide="plus" class="w-4 h-4"></i></span>
+              <span>Nova atividade</span>
+            </button>
+          </aside>
+          <section class="history-list-card">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <p class="profile-eyebrow">Lista completa</p>
+                <h3 class="text-lg font-bold text-slate-900">Registros encontrados</h3>
+              </div>
+              <span id="modal-activities-filtered-count" class="profile-count-pill">0</span>
+            </div>
+            <div id="modal-activities-history-list" class="space-y-3"></div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR PERFIL DO ALUNO -->
+    <div id="modal-edit-student" class="hidden-view fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-6">
+      <div class="w-full max-w-4xl max-h-[92vh] bg-white rounded-2xl shadow-xl border border-slate-200 flex flex-col overflow-hidden animate-fade-in">
+        <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-3 flex-shrink-0">
+          <div>
+            <p class="profile-eyebrow">Ficha cadastral</p>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-900">Editar dados do aluno</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">Atualize somente os campos necessários e salve para sincronizar com o banco.</p>
+          </div>
+          <button onclick="window.app.toggleStudentEdit(false)" class="app-icon-btn" aria-label="Fechar edição">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto no-scrollbar p-4 sm:p-6">
+          <div id="profile-edit-form">
+            <div class="edit-profile-grid">
+              <div class="edit-profile-section edit-profile-section-wide">
+                <div class="edit-section-heading">
+                  <span><i data-lucide="user-round" class="w-4 h-4"></i></span>
+                  <div>
+                    <h4>Dados principais</h4>
+                    <p>Identificação básica do aluno.</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                  <div class="sm:col-span-2">
+                    <label class="app-label">Nome completo *</label>
+                    <input id="edit-nome" type="text" class="app-input" placeholder="Nome completo do aluno">
+                  </div>
+                  <div>
+                    <label class="app-label">Data de nascimento *</label>
+                    <input id="edit-data-nascimento" type="date" class="app-input" onchange="window.app.atualizarIdadeCalculada('edit')" oninput="window.app.atualizarIdadeCalculada('edit')">
+                    <p id="edit-idade-calculada" class="mt-1.5 text-xs font-semibold text-slate-400">Idade calculada automaticamente.</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label class="app-label">Professora</label>
+                    <select id="edit-professora" onchange="window.app.sincronizarSelectTurmasAluno('edit')" class="app-input">
+                      <option value="">Carregando professoras...</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="app-label">Turma / Classe</label>
+                    <select id="edit-turma" class="app-input">
+                      <option value="">Carregando turmas...</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-profile-section">
+                <div class="edit-section-heading">
+                  <span><i data-lucide="users-round" class="w-4 h-4"></i></span>
+                  <div>
+                    <h4>Família</h4>
+                    <p>Dados dos responsáveis familiares.</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                  <div>
+                    <label class="app-label">Nome da mãe</label>
+                    <input id="edit-mae" type="text" class="app-input" placeholder="Nome da mãe">
+                  </div>
+                  <div>
+                    <label class="app-label">Nome do pai</label>
+                    <input id="edit-pai" type="text" class="app-input" placeholder="Nome do pai">
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-profile-section">
+                <div class="edit-section-heading">
+                  <span><i data-lucide="phone" class="w-4 h-4"></i></span>
+                  <div>
+                    <h4>Contato</h4>
+                    <p>Telefones e endereço.</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 gap-4 mt-4">
+                  <div>
+                    <label class="app-label">Contacto 1</label>
+                    <input id="edit-contato1" type="text" class="app-input" placeholder="Telefone principal">
+                  </div>
+                  <div>
+                    <label class="app-label">Contacto 2</label>
+                    <input id="edit-contato2" type="text" class="app-input" placeholder="Telefone alternativo">
+                  </div>
+                  <div>
+                    <label class="app-label">Morada</label>
+                    <input id="edit-endereco" type="text" class="app-input" placeholder="Endereço completo">
+                  </div>
+                </div>
+              </div>
+
+              <div class="edit-profile-section edit-profile-section-wide">
+                <div class="edit-section-heading">
+                  <span><i data-lucide="shield-check" class="w-4 h-4"></i></span>
+                  <div>
+                    <h4>Autorizações e cuidados</h4>
+                    <p>Pessoas autorizadas, saúde, alergias e observações importantes.</p>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <label class="app-label">Responsável autorizado 1</label>
+                    <input id="edit-resp1" type="text" class="app-input">
+                  </div>
+                  <div>
+                    <label class="app-label">Responsável autorizado 2</label>
+                    <input id="edit-resp2" type="text" class="app-input">
+                  </div>
+                  <div>
+                    <label class="app-label">Responsável autorizado 3</label>
+                    <input id="edit-resp3" type="text" class="app-input">
+                  </div>
+                  <div class="sm:col-span-3">
+                    <label class="app-label">Indicações, saúde e alergias</label>
+                    <textarea id="edit-indicacoes" rows="3" class="app-input" placeholder="Cuidados especiais, alergias ou observações"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-4 sm:px-6 py-4 border-t border-slate-100 bg-white flex flex-col sm:flex-row justify-end gap-3 pb-safe">
+          <button onclick="window.app.toggleStudentEdit(false)" class="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition-colors touch-manipulation">Cancelar</button>
+          <button id="btn-save-profile" onclick="window.app.saveStudentProfile()" class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold transition-colors touch-manipulation flex items-center justify-center gap-2 shadow-sm">
+            <i data-lucide="save" class="w-4 h-4"></i> Guardar alterações
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cache busting: atualize o ?v= a cada deploy no GitHub Pages -->
+        <script src="assets/js/config.js?v=2026-05-01-erp-app-v36-child-page-clean"></script>
+    <script src="assets/js/helpers.js?v=2026-05-01-erp-app-v36-child-page-clean"></script>
+    <script src="assets/js/app.js?v=2026-05-01-erp-app-v36-child-page-clean"></script>
+  </body>
+  </html>
